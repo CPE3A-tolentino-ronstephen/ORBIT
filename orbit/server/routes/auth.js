@@ -18,9 +18,9 @@ router.post("/verify", (req, res) => {
   const decoded = decodeJWT(idToken);
   if (!decoded) return res.status(401).json({ error: "Invalid token" });
 
-  const uid   = decoded.user_id || decoded.sub;
-  const email = decoded.email   || decoded.email_verified || "";
-  const name  = decoded.name
+  const uid     = decoded.user_id || decoded.sub;
+  const email   = decoded.email || decoded.email_verified || "";
+  const name    = decoded.name
     || decoded.user_metadata?.full_name
     || email;
   const picture = decoded.picture
@@ -31,7 +31,7 @@ router.post("/verify", (req, res) => {
 });
 
 router.get("/me", (req, res) => {
-  const token   = (req.headers.authorization || "").replace("Bearer ", "");
+  const token = (req.headers.authorization || "").replace("Bearer ", "");
   if (!token) return res.status(401).json({ error: "Unauthorized" });
 
   const decoded = decodeJWT(token);
