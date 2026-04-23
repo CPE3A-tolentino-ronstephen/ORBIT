@@ -222,6 +222,19 @@ export default function LandingPage() {
         .lnav-sub { font-size: 11px; color: var(--gray-400); font-family: var(--font-mono); }
         .lnav-actions { display: flex; gap: 12px; align-items: center; }
 
+        .auth-logo {
+          width: 48px; 
+          height: 48px;
+          background: linear-gradient(135deg, var(--orbit-green), var(--orbit-green-dim));
+          border-radius: 13px;
+          display: flex; 
+          align-items: center; 
+          justify-content: center;
+          box-shadow: 0 4px 24px rgba(16,185,129,.4);
+          overflow: hidden; 
+        }
+
+
         .hero {
           flex: 1;
           display: flex;
