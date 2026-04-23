@@ -4,13 +4,13 @@ import { useAuth }            from "../context/AuthContext";
 import { useDisease }         from "../hooks/useDisease";
 
 const DISEASES = [
-  { key: "covid19",      label: "COVID-19",     icon: "🦠", color: "#3b82f6" },
-  { key: "tuberculosis", label: "Tuberculosis", icon: "🫁", color: "#7c3aed" },
-  { key: "malaria",      label: "Malaria",      icon: "🦟", color: "#16a34a" },
-  { key: "hiv",          label: "HIV/AIDS",     icon: "🔴", color: "#dc2626" },
-  { key: "mpox",         label: "Mpox",         icon: "🧬", color: "#8b5cf6" },
-  { key: "cholera",      label: "Cholera",      icon: "💧", color: "#0891b2" },
-  { key: "measles",      label: "Measles",      icon: "⚕️", color: "#db2777" },
+  { key: "covid19",      label: "COVID-19",     icon: "", color: "#3b82f6" },
+  { key: "tuberculosis", label: "Tuberculosis", icon: "", color: "#7c3aed" },
+  { key: "malaria",      label: "Malaria",      icon: "", color: "#16a34a" },
+  { key: "hiv",          label: "HIV/AIDS",     icon: "", color: "#dc2626" },
+  { key: "mpox",         label: "Mpox",         icon: "", color: "#8b5cf6" },
+  { key: "cholera",      label: "Cholera",      icon: "", color: "#0891b2" },
+  { key: "measles",      label: "Measles",      icon: "", color: "#db2777" },
 ];
 
 function fmt(n) {
@@ -352,7 +352,7 @@ export default function DashboardPage() {
 
       <div className="dash-header">
         <div>
-          <div className="dash-greeting">{greeting}, Researcher 👋</div>
+          <div className="dash-greeting">{greeting}, Researcher</div>
           <div className="dash-title">Global Outbreak Intelligence</div>
         </div>
         <div className="disease-tabs">
