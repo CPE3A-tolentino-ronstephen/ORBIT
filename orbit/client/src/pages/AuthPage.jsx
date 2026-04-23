@@ -136,15 +136,12 @@ export default function AuthPage() {
           pointer-events: none; 
         }
 
-        .auth-brand {
+         .auth-brand {
           position: relative;
           z-index: 1;
           display: flex;
-          flex-direction: column;
           align-items: center;
-          justify-content: center;
-          text-align: center; 
-          gap: 12px;
+          gap: 14px;
         }
         .auth-logo {
           width: 48px; 
