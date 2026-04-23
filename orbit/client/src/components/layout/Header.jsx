@@ -83,7 +83,7 @@ export default function Header({ onToggleSidebar }) {
           gap: 8px;
           font-size: 12.48px; 
           color: var(--gray-500);
-          font-family: var(--font-mono);
+          font-family: var(--font-sana);
         }
         
         .header-time {
