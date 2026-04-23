@@ -576,8 +576,8 @@ export default function LandingPage() {
           </h1>
 
           <p className="hero-tagline">
-            Tracking today for a healthier tomorrow. O.R.B.I.T. delivers live outbreak intelligence,
-            interactive outbreak maps, and deep statistical analysis across 195+ countries.
+            O.R.B.I.T. delivers live outbreak intelligence,
+            interactive outbreak maps, and deep statistical analysis across countries
           </p>
 
           <div className="hero-actions">
@@ -612,27 +612,27 @@ export default function LandingPage() {
 
       <section className="features" id="features">
         <div className="section-label">Platform Capabilities</div>
-        <div className="section-title">TRACK EVERYTHING</div>
+        <div className="section-title">TRACKING TODAY FOR A HEALTHIER TOMORROW</div>
         <div className="features-grid">
           <div className="feature-card">
 
             <h3>Interactive Outbreak Map</h3>
-            <p>Live heatmap across 195+ countries. Color-coded by risk level — critical to minimal. Drill down to country-level detail with a single click.</p>
+            <p>Live heatmap across 195+ countries. Color-coded by risk level. Drill down to country-level detail with a single click.</p>
           </div>
           <div className="feature-card">
 
             <h3>Statistical Deep Dive</h3>
-            <p>Historical trend lines, continent comparisons, case fatality rates, and recovery trajectories — all updated every 5 minutes from live sources.</p>
+            <p>Historical trend lines, continent comparisons, case fatality rates, and recovery trajectories.</p>
           </div>
           <div className="feature-card">
   
             <h3>AI Risk Scoring</h3>
-            <p>Every country receives a 0–100 risk score computed from case density, mortality rate, and active case trajectory. Updated in real time.</p>
+            <p>Every country receives a 0–100 risk score computed from case density, mortality rate, and active case trajectory.</p>
           </div>
           <div className="feature-card">
      
             <h3>Multi-Disease Tracking</h3>
-            <p>Switch between COVID-19, Mpox, HIV/AIDS and more. Built on an adapter pattern — add any new disease source without changing the codebase.</p>
+            <p>Switch between historical known diseases like COVID-19, Mpox, HIV/AIDS, and more.</p>
           </div>
           <div className="feature-card">
         
@@ -642,15 +642,15 @@ export default function LandingPage() {
           <div className="feature-card">
        
             <h3>Secure Authentication</h3>
-            <p>Google Sign-In powered by Firebase. Your session is secure and your data is private. Role-based access for researcher and admin levels.</p>
+            <p>Google Sign-In powered by Firebase. Your session is secure and your data is private.</p>
           </div>
         </div>
       </section>
 
       <footer className="landing-footer">
-        <p>© 2026 O.R.B.I.T.|Outbreak Reporting & Biological Intelligence Tracker</p>
+        <p>© 2026 O.R.B.I.T. | Outbreak Reporting & Biological Intelligence Tracker</p>
         <div className="footer-links">
-        <p>© BULACAN STATE UNIVERSITY</p>
+        <p>All Rights Reserved | Bulacan State University</p>
 
         </div>
       </footer>
