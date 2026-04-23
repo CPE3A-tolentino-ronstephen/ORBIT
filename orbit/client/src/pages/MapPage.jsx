@@ -1,6 +1,6 @@
 import { useState, useMemo }                  from "react";
 import { MapContainer, TileLayer,
-         CircleMarker, Popup }                from "react-leaflet";
+         CircleMarker }                       from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useDisease }                         from "../hooks/useDisease";
 import { enrichCountriesWithCoords }          from "../utils/countryCoordinates";
@@ -53,12 +53,93 @@ function circleRadius(cases, maxCases) {
   return Math.max(4, Math.min(32, ratio * 32));
 }
 
+function DetailPopup({ selected, isOwid, activeDisease, onClose }) {
+  if (!selected) return null;
+
+  const isHiv = activeDisease === "hiv";
+
+  const baseRows = [
+    {
+      label: isHiv ? "New Infections" : "Total Cases",
+      val:   fmt(selected.cases),
+    },
+    {
+      label: isHiv ? "Annual Deaths" : "Deaths",
+      val:   fmt(selected.deaths),
+    },
+    {
+      label: "Mortality Rate",
+      val:   fmtPct(selected.caseFatalityRate),
+    },
+    ...(!isHiv
+      ? [{ label: "Cases / 1M pop", val: fmt(selected.casesPerMillion) }]
+      : []
+    ),
+  ];
+
+  const covidRows = [
+    { label: "Recovered",       val: fmt(selected.recovered) },
+    { label: "Active Cases",    val: fmt(selected.active) },
+    { label: "Critical",        val: fmt(selected.critical) },
+    { label: "Deaths / 1M pop", val: fmt(selected.deathsPerMillion) },
+    { label: "Today + Cases",   val: fmt(selected.todayCases) },
+  ];
+
+  const owidRows = [
+    { label: "Data Year", val: selected.year ?? "—" },
+    { label: "Source",    val: selected.source ?? "OWID / WHO" },
+  ];
+
+  const rows = isOwid
+    ? [...baseRows, ...owidRows]
+    : [...baseRows, ...covidRows];
+
+  return (
+    <div className="map-detail-overlay" onClick={onClose}>
+      <div
+        className="map-detail-card card detail-card"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="detail-country-header">
+          {selected.flag && (
+            <img src={selected.flag} alt="" className="detail-flag" />
+          )}
+          <div>
+            <div className="detail-country-name">{selected.country}</div>
+            <span
+              className={`badge badge-${(selected.risk ?? "").toLowerCase()}`}
+              style={{ color: riskColor(selected.risk), fontSize: ".72rem", fontWeight: 700 }}
+            >
+              {selected.risk} Risk · {selected.riskScore}/100
+            </span>
+          </div>
+          <button
+            onClick={onClose}
+            className="detail-close-btn"
+            aria-label="Close"
+          >✕</button>
+        </div>
+
+        <div className="detail-rows">
+          {rows.map(({ label, val }) => (
+            <div className="detail-row" key={label}>
+              <span className="detail-row-label">{label}</span>
+              <span className="detail-row-val">{val}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function MapPage() {
   const [activeDisease, setActiveDisease] = useState("covid19");
   const [activeRisks,   setActiveRisks]   = useState(
     new Set(RISK_LEVELS.map(r => r.label))
   );
-  const [showLegend, setShowLegend] = useState(false);
+  const [showLegend,  setShowLegend]  = useState(false);
+  const [selected,    setSelected]    = useState(null);
 
   const { countries, loading, error, isOwid, refetch } = useDisease(activeDisease);
 
@@ -81,6 +162,7 @@ export default function MapPage() {
 
   const handleDiseaseChange = (key) => {
     setActiveDisease(key);
+    setSelected(null);
   };
 
   const toggleRisk = (label) => {
@@ -150,7 +232,7 @@ export default function MapPage() {
           min-width:170px;
         }
         .map-legend-title { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--gray-500); font-family:var(--font-mono); margin-bottom:.5rem; }
-        .legend-item { 
+        .legend-item {
           display:flex; align-items:center; gap:.5rem;
           font-size:.78rem; color:var(--gray-700);
           margin-bottom:.25rem; font-weight:500;
@@ -172,9 +254,48 @@ export default function MapPage() {
           font-size:.75rem; color:var(--gray-500); font-family:var(--font-mono);
         }
         .error-bar { background:#fef2f2; border:1px solid #fecaca; border-radius:var(--radius-sm); padding:.6rem 1rem; font-size:.82rem; color:#dc2626; display:flex; align-items:center; justify-content:space-between; }
+
+        .map-detail-overlay {
+          position: absolute; inset: 0; z-index: 1500;
+          display: flex; align-items: center; justify-content: center;
+          background: rgba(0, 0, 0, .32);
+          backdrop-filter: blur(2px);
+          animation: fadeIn .18s ease;
+        }
+        @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+        .map-detail-card {
+          background: var(--white);
+          border: 1px solid var(--border);
+          border-radius: var(--radius);
+          padding: 1.25rem 1.5rem;
+          width: 320px;
+          max-width: calc(100vw - 2rem);
+          box-shadow: 0 20px 60px rgba(0,0,0,.18);
+          animation: slideUp .2s ease;
+        }
+        @keyframes slideUp { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
+        .detail-country-header {
+          display:flex; align-items:center; gap:.75rem; margin-bottom:1rem;
+        }
+        .detail-flag { width:36px; height:24px; object-fit:cover; border-radius:3px; flex-shrink:0; }
+        .detail-country-name { font-size:1.05rem; font-weight:800; color:var(--gray-900); }
+        .detail-close-btn {
+          margin-left: auto; background: none; border: none;
+          cursor: pointer; color: var(--gray-400); font-size: 1rem;
+          line-height: 1; padding: .2rem .4rem; border-radius: 4px;
+          transition: background .15s, color .15s;
+        }
+        .detail-close-btn:hover { background: var(--gray-100); color: var(--gray-700); }
+        .detail-rows { display: flex; flex-direction: column; }
+        .detail-row {
+          display:flex; justify-content:space-between; align-items:center;
+          padding:.45rem 0; border-bottom:1px solid var(--border); font-size:.875rem;
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-row-label { color: var(--gray-500); }
+        .detail-row-val { font-weight:700; color:var(--gray-900); font-family:var(--font-mono); font-size:.85rem; }
       `}</style>
 
-      {/* Header */}
       <div className="map-header">
         <div>
           <div className="map-title">🗺 Live Outbreak Map</div>
@@ -187,27 +308,24 @@ export default function MapPage() {
               className={`map-tab ${activeDisease === d.key ? "active" : ""}`}
               onClick={() => handleDiseaseChange(d.key)}
             >
- {d.label}
+              {d.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Error */}
       {error && (
         <div className="error-bar">
           <span>⚠ {error}</span>
           <button
             onClick={refetch}
-            style={{ background:"none", border:"none", cursor:"pointer",
-                     fontWeight:700, color:"#dc2626" }}
+            style={{ background:"none", border:"none", cursor:"pointer", fontWeight:700, color:"#dc2626" }}
           >
             Retry
           </button>
         </div>
       )}
 
-      {/* Body */}
       <div className="map-body">
         <div className="map-wrapper">
 
@@ -249,54 +367,27 @@ export default function MapPage() {
                   weight:      1.5,
                   opacity:     0.9,
                 }}
-                eventHandlers={{ click: () => {} }}
-              >
-                <Popup>
-                  <div style={{ fontFamily:"var(--font-body)", minWidth:200 }}>
-                    <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
-                      {c.flag && (
-                        <img
-                          src={c.flag} alt=""
-                          style={{ width:26, height:17, objectFit:"cover", borderRadius:3 }}
-                        />
-                      )}
-                      <strong style={{ fontSize:15, color:"#111827" }}>{c.country}</strong>
-                    </div>
-                    <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:10 }}>
-                      <span style={{
-                        width:9, height:9, borderRadius:"50%",
-                        background: riskColor(c.risk), display:"inline-block"
-                      }} />
-                      <span style={{ fontSize:12, fontWeight:700, color: riskColor(c.risk) }}>
-                        {c.risk} Risk · {c.riskScore}/100
-                      </span>
-                    </div>
-                    <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
-                      <tbody>
-                        {[
-                          ["Cases",   fmt(c.cases)],
-                          ["Deaths",  fmt(c.deaths)],
-                          ["Active",  fmt(c.active)],
-                          ["Today +", fmt(c.todayCases)],
-                          ...(isOwid ? [["Mortality", fmtPct(c.caseFatalityRate)]] : []),
-                        ].map(([l, v]) => (
-                          <tr key={l}>
-                            <td style={{ color:"#6b7280", padding:"3px 0" }}>{l}</td>
-                            <td style={{ textAlign:"right", fontWeight:700, fontFamily:"monospace" }}>{v}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </Popup>
-              </CircleMarker>
+                eventHandlers={{
+                  click: () => setSelected(c),
+                }}
+              />
             ))}
           </MapContainer>
 
-          {/* Legend with filter checkboxes */}
+          <DetailPopup
+            selected={selected}
+            isOwid={isOwid}
+            activeDisease={activeDisease}
+            onClose={() => setSelected(null)}
+          />
+
           <div className="map-legend">
-            <div className="map-legend-title" onClick={() => setShowLegend(!showLegend)} style={{ cursor: 'pointer' }}>
-                 Risk Level {showLegend ? '▼' : '▶'}
+            <div
+              className="map-legend-title"
+              onClick={() => setShowLegend(!showLegend)}
+              style={{ cursor:"pointer" }}
+            >
+              Risk Level {showLegend ? "▼" : "▶"}
             </div>
             {showLegend && (
               <>
@@ -326,8 +417,8 @@ export default function MapPage() {
             )}
           </div>
 
-          {!loading && visibleCountries.length > 0 && (
-            <div className="map-tip">💡 Click any circle for details</div>
+          {!loading && visibleCountries.length > 0 && !selected && (
+            <div className="map-tip">Click any circle for details</div>
           )}
         </div>
       </div>

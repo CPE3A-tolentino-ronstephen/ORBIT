@@ -2,11 +2,11 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const TICKER_ITEMS = [
-  "🦠 Global Health Surveillance",
-  "📡 Disease Outbreak Data Statistics from 195+ Countries",
-  "📊 Historical Trend Analysis",
-  "🗺 Interactive Outbreak Map",
-  "⚡ Risk Scoring Across Nations"
+  " Global Health Surveillance",
+  " Disease Outbreak Data Statistics from 195+ Countries",
+  " Historical Trend Analysis",
+  " Interactive Outbreak Map",
+  " Risk Scoring Across Nations"
 ];
 
 function GlobeCanvas() {
@@ -320,7 +320,7 @@ export default function LandingPage() {
         }
         
         .hero h1 {
-          font-size: 48px;
+          font-size: 60px;
           font-weight: 800;
           color: var(--gray-900);
           line-height: 1.1;
@@ -516,7 +516,7 @@ export default function LandingPage() {
           .lnav { padding: 5px 20px; }
           .features { padding: 60px 20px; }
           .landing-footer { padding: 24px 20px; flex-direction: column; text-align: center; }
-          .hero h1 { font-size: 32px; }
+          .hero h1 { font-size: 50px; }
           .hero-tagline { font-size: 16px; padding: 0 20px; }
           .hero-stats { gap: 30px; }
           .hero-actions { flex-direction: column; align-items: center; }
@@ -567,9 +567,12 @@ export default function LandingPage() {
 
         <div className="hero-content">
           <h1>
-            THE PULSE OF<br/>
-            WORLD HEALTH<br />
-            <em>AT YOUR FINGERTIPS</em>
+            OUTBREAK
+            REPORTING &<br />
+            <em>
+             BIOLOGICAL INTELLIGENCE <br/> 
+             TRACKER<br/>
+             </em>
           </h1>
 
           <p className="hero-tagline">
