@@ -293,6 +293,27 @@ h1, h2, h3, h4, h5 {
 .ticker-track:hover {
   animation-play-state: paused;
 }
+.pass-toggle {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin-right: 8px;
+}
+
+.toggle-icon {
+  width: 20px;  
+  height: auto;
+  opacity: 0.6;  
+  transition: opacity 0.2s ease;
+}
+
+.toggle-icon:hover {
+  opacity: 1;   
+}
 
 .data-table {
   width: 100%;
