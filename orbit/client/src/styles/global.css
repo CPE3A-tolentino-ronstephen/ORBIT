@@ -51,7 +51,7 @@ html {
 
 body {
   font-family: var(--font-body);
-   background: url('C:\\Users\\Administrator\\Documents\\GitHub\\ORBIT\\orbit\\client\\src\\styles\\obg3.jpg') center center / cover no-repeat fixed;
+background: url('./obg3.jpg') center center / cover no-repeat fixed;   
   color: var(--gray-800);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
