@@ -352,8 +352,9 @@ export default function DashboardPage() {
 
       <div className="dash-header">
         <div>
-          <div className="dash-greeting">{greeting}, Researcher</div>
+          
           <div className="dash-title">Global Outbreak Intelligence</div>
+          <div className="dash-greeting">Select Subject, Explore Data by Disease</div>
         </div>
         <div className="disease-tabs">
           {DISEASES.map(d => (
@@ -445,7 +446,7 @@ export default function DashboardPage() {
             </span>
             <input
               className="search-input"
-              placeholder="🔍 Search country..."
+              placeholder="Search country"
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
