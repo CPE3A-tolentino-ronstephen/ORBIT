@@ -609,7 +609,7 @@ export default function LandingPage() {
                Launch Dashboard
             </button>
             <a href="#features" className="btn btn-ghost" style={{ padding: "14px 32px", fontSize: "16px" }}>
-              Explore Features →
+              Explore Features
             </a>
           </div>
 
@@ -646,7 +646,7 @@ export default function LandingPage() {
           </div>
           <div className="feature-card">
   
-            <h3>AI Risk Scoring</h3>
+            <h3>Risk Scoring</h3>
             <p>Every country receives a 0–100 risk score computed from case density, mortality rate, and active case trajectory.</p>
           </div>
           <div className="feature-card">

@@ -594,9 +594,16 @@ export default function AuthPage() {
           </form>
         )}
 
-        {}
         {tab === "register" && (
           <form onSubmit={handleRegister} noValidate>
+
+            {displayErr && (
+              <div className="auth-error">{displayErr}</div>
+            )}
+            {success && (
+              <div className="auth-success">{success}</div>
+            )}
+
             <div className="form-field">
               <label className="form-label">Full name</label>
               <input
@@ -609,6 +616,7 @@ export default function AuthPage() {
                 disabled={signing}
               />
             </div>
+
             <div className="form-field">
               <label className="form-label">Email address</label>
               <input
@@ -621,6 +629,7 @@ export default function AuthPage() {
                 disabled={signing}
               />
             </div>
+
             <div className="form-field">
               <label className="form-label">Password</label>
               <div className="pass-wrap">
@@ -633,12 +642,17 @@ export default function AuthPage() {
                   autoComplete="new-password"
                   disabled={signing}
                 />
-                <button type="button" className="pass-toggle" onClick={() => setShowPass((s) => !s)} tabIndex={-1}>
-                   <img src={showPass ? "/eye.png" : "/show.png"} className="toggle-icon" />
+                <button
+                  type="button"
+                  className="pass-toggle"
+                  onClick={() => setShowPass(s => !s)}
+                  tabIndex={-1}
+                >
+                  <img src={showPass ? "/eye.png" : "/show.png"} className="toggle-icon" />
                 </button>
               </div>
-              
             </div>
+
             <div className="form-field">
               <label className="form-label">Confirm password</label>
               <input
@@ -651,9 +665,11 @@ export default function AuthPage() {
                 disabled={signing}
               />
             </div>
+
             <button className="submit-btn" type="submit" disabled={signing}>
               {signing ? "Creating account..." : "Create Account"}
             </button>
+
           </form>
         )}
 
