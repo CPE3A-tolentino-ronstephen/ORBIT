@@ -236,16 +236,6 @@ export default function AuthPage() {
           border-left: 0px !important; 
         }
 
-        .auth-center {
-          position: absolute;
-          inset: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1;
-          pointer-events: none;
-        }
-
         .auth-tabs {
           display: flex;
           gap: 0;
@@ -477,6 +467,7 @@ export default function AuthPage() {
           color: var(--gray-900); 
         }
 
+
         @media (max-width: 768px) {
           .auth-page { grid-template-columns: 1fr; }
           .auth-panel-left { display: none; }
@@ -487,15 +478,13 @@ export default function AuthPage() {
       {}
       <div className="auth-panel-left">
         <div className="auth-panel-left-grid" />
-        <div className="auth-center">
-          <div className="auth-brand">
-            <div className="auth-logo">
-              <img src="/logo.png" alt="O.R.B.I.T. Logo" />
-            </div>
-            <div className="auth-brand-text">
-              <strong>O.R.B.I.T.</strong>
-              <span>THE PULSE OF WORLD HEALTH AT YOUR FINGERTIPS</span>
-            </div>
+        <div className="auth-brand">
+           <div className="auth-logo">
+            <img src="/logo.png" alt="O.R.B.I.T. Logo" />
+           </div>
+          <div className="auth-brand-text">
+            <strong>O.R.B.I.T.</strong>
+            <span>THE PULSE OF WORLD HEALTH AT YOUR FINGERTIPS</span>
           </div>
         </div>
         <div className="auth-hero-text">

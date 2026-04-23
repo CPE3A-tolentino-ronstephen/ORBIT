@@ -234,6 +234,12 @@ export default function LandingPage() {
           overflow: hidden; 
         }
 
+        .auth-logo img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+
         .hero {
           flex: 1;
           display: flex;
