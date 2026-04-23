@@ -47,18 +47,24 @@ export default function Sidebar({ collapsed }) {
         }
         
         .orbit-logo {
-          width: 38px; 
+          width: 38px;
           height: 38px;
           background: linear-gradient(135deg, var(--orbit-green), var(--orbit-green-dim));
           border-radius: 10px;
-          display: flex; 
-          align-items: center; 
+          display: flex;
+          align-items: center;
           justify-content: center;
-          font-size: 19.2px;
           flex-shrink: 0;
           box-shadow: var(--shadow-green);
+          overflow: hidden;
         }
-        
+
+        .orbit-logo img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+                
         .orbit-wordmark strong {
           display: block;
           font-family: var(--font-display);
@@ -207,7 +213,9 @@ export default function Sidebar({ collapsed }) {
       `}</style>
 
       <NavLink to="/dashboard" className="sidebar-brand" style={{ textDecoration: "none" }}>
-        <div className="orbit-logo">🛰</div>
+        <div className="orbit-logo">
+          <img src="/logo.png" alt="O.R.B.I.T. Logo" />
+        </div>
         {!collapsed && (
           <div className="orbit-wordmark">
             <strong>O.R.B.I.T.</strong>
@@ -239,7 +247,7 @@ export default function Sidebar({ collapsed }) {
           )}
         </div>
         <button className="logout-btn" onClick={handleLogout}>
-          <span>⏻</span>
+          <span>←</span>
           {!collapsed && "Sign Out"}
         </button>
       </div>
