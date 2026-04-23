@@ -59,22 +59,10 @@ function DetailPopup({ selected, isOwid, activeDisease, onClose }) {
   const isHiv = activeDisease === "hiv";
 
   const baseRows = [
-    {
-      label: isHiv ? "New Infections" : "Total Cases",
-      val:   fmt(selected.cases),
-    },
-    {
-      label: isHiv ? "Annual Deaths" : "Deaths",
-      val:   fmt(selected.deaths),
-    },
-    {
-      label: "Mortality Rate",
-      val:   fmtPct(selected.caseFatalityRate),
-    },
-    ...(!isHiv
-      ? [{ label: "Cases / 1M pop", val: fmt(selected.casesPerMillion) }]
-      : []
-    ),
+    { label: isHiv ? "New Infections" : "Total Cases", val: fmt(selected.cases) },
+    { label: isHiv ? "Annual Deaths"  : "Deaths",      val: fmt(selected.deaths) },
+    { label: "Mortality Rate",                          val: fmtPct(selected.caseFatalityRate) },
+    ...(!isHiv ? [{ label: "Cases / 1M pop", val: fmt(selected.casesPerMillion) }] : []),
   ];
 
   const covidRows = [
@@ -90,36 +78,23 @@ function DetailPopup({ selected, isOwid, activeDisease, onClose }) {
     { label: "Source",    val: selected.source ?? "OWID / WHO" },
   ];
 
-  const rows = isOwid
-    ? [...baseRows, ...owidRows]
-    : [...baseRows, ...covidRows];
+  const rows = isOwid ? [...baseRows, ...owidRows] : [...baseRows, ...covidRows];
 
   return (
     <div className="map-detail-overlay" onClick={onClose}>
-      <div
-        className="map-detail-card card detail-card"
-        onClick={e => e.stopPropagation()}
-      >
+      <div className="map-detail-card" onClick={e => e.stopPropagation()}>
         <div className="detail-country-header">
           {selected.flag && (
             <img src={selected.flag} alt="" className="detail-flag" />
           )}
           <div>
             <div className="detail-country-name">{selected.country}</div>
-            <span
-              className={`badge badge-${(selected.risk ?? "").toLowerCase()}`}
-              style={{ color: riskColor(selected.risk), fontSize: ".72rem", fontWeight: 700 }}
-            >
+            <span style={{ color: riskColor(selected.risk), fontSize: ".72rem", fontWeight: 700 }}>
               {selected.risk} Risk · {selected.riskScore}/100
             </span>
           </div>
-          <button
-            onClick={onClose}
-            className="detail-close-btn"
-            aria-label="Close"
-          >✕</button>
+          <button onClick={onClose} className="detail-close-btn" aria-label="Close">✕</button>
         </div>
-
         <div className="detail-rows">
           {rows.map(({ label, val }) => (
             <div className="detail-row" key={label}>
@@ -135,11 +110,9 @@ function DetailPopup({ selected, isOwid, activeDisease, onClose }) {
 
 export default function MapPage() {
   const [activeDisease, setActiveDisease] = useState("covid19");
-  const [activeRisks,   setActiveRisks]   = useState(
-    new Set(RISK_LEVELS.map(r => r.label))
-  );
-  const [showLegend,  setShowLegend]  = useState(false);
-  const [selected,    setSelected]    = useState(null);
+  const [activeRisks,   setActiveRisks]   = useState(new Set(RISK_LEVELS.map(r => r.label)));
+  const [showLegend,    setShowLegend]    = useState(false);
+  const [selected,      setSelected]      = useState(null);
 
   const { countries, loading, error, isOwid, refetch } = useDisease(activeDisease);
 
@@ -160,10 +133,7 @@ export default function MapPage() {
     [mappableCountries, activeRisks]
   );
 
-  const handleDiseaseChange = (key) => {
-    setActiveDisease(key);
-    setSelected(null);
-  };
+  const handleDiseaseChange = (key) => { setActiveDisease(key); setSelected(null); };
 
   const toggleRisk = (label) => {
     setActiveRisks(prev => {
@@ -174,10 +144,8 @@ export default function MapPage() {
   };
 
   const toggleAll = () => {
-    const allLabels = RISK_LEVELS.map(r => r.label);
-    setActiveRisks(prev =>
-      prev.size === allLabels.length ? new Set() : new Set(allLabels)
-    );
+    const all = RISK_LEVELS.map(r => r.label);
+    setActiveRisks(prev => prev.size === all.length ? new Set() : new Set(all));
   };
 
   const allChecked = activeRisks.size === RISK_LEVELS.length;
@@ -203,17 +171,27 @@ export default function MapPage() {
         }
         .map-tab:hover { border-color:var(--orbit-green); color:var(--orbit-green-dim); }
         .map-tab.active { background:var(--orbit-green); color:white; border-color:var(--orbit-green); box-shadow:var(--shadow-green); }
+
         .map-body { flex:1; min-height:0; }
         .map-wrapper {
-          flex:1; position:relative; border-radius:var(--radius);
+          position:relative; border-radius:var(--radius);
           overflow:hidden; border:1px solid var(--border);
-          min-height:520px; background:#f0f4f8;
+          min-height:520px;
+          /* Warm off-white background matches Toner Lite ocean color */
+          background:#f5f0e8;
         }
         .leaflet-container { width:100%; height:100%; min-height:520px; border-radius:var(--radius); }
+        .leaflet-control-attribution {
+          font-size:.6rem !important;
+          background:rgba(255,255,255,.75) !important;
+          backdrop-filter:blur(4px);
+        }
+
+        /* ── Loading overlay ── */
         .map-loading {
           position:absolute; inset:0; z-index:2000;
           display:flex; flex-direction:column; align-items:center; justify-content:center;
-          background:rgba(255,255,255,.85); backdrop-filter:blur(4px);
+          background:rgba(245,240,232,.9); backdrop-filter:blur(4px);
           gap:14px; border-radius:var(--radius);
         }
         @keyframes spin { to { transform:rotate(360deg); } }
@@ -224,14 +202,21 @@ export default function MapPage() {
           border-radius:50%; animation:spin .8s linear infinite;
         }
         .map-loading p { font-size:14px; color:var(--gray-500); font-family:var(--font-mono); }
+
+        /* ── Legend ── */
         .map-legend {
           position:absolute; bottom:1.5rem; left:1rem;
-          background:rgba(255,255,255,.96); backdrop-filter:blur(8px);
-          border:1px solid var(--border); border-radius:var(--radius-sm);
-          padding:.875rem 1rem; z-index:1000; box-shadow:var(--shadow);
+          background:rgba(255,253,248,.97); backdrop-filter:blur(8px);
+          border:1px solid rgba(0,0,0,.1); border-radius:var(--radius-sm);
+          padding:.875rem 1rem; z-index:1000;
+          box-shadow:0 4px 20px rgba(0,0,0,.1);
           min-width:170px;
         }
-        .map-legend-title { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--gray-500); font-family:var(--font-mono); margin-bottom:.5rem; }
+        .map-legend-title {
+          font-size:.68rem; font-weight:700; text-transform:uppercase;
+          letter-spacing:.08em; color:var(--gray-500); font-family:var(--font-mono);
+          margin-bottom:.5rem;
+        }
         .legend-item {
           display:flex; align-items:center; gap:.5rem;
           font-size:.78rem; color:var(--gray-700);
@@ -246,56 +231,63 @@ export default function MapPage() {
           background:none; border:none; cursor:pointer; padding:0;
           margin-bottom:.4rem; font-weight:700; text-decoration:underline;
         }
+
+        /* ── Tip ── */
         .map-tip {
           position:absolute; bottom:1.5rem; right:1rem;
-          background:rgba(255,255,255,.88); backdrop-filter:blur(6px);
-          border:1px solid var(--border); border-radius:var(--radius-sm);
+          background:rgba(255,253,248,.92); backdrop-filter:blur(6px);
+          border:1px solid rgba(0,0,0,.09); border-radius:var(--radius-sm);
           padding:.5rem .875rem; z-index:999;
           font-size:.75rem; color:var(--gray-500); font-family:var(--font-mono);
+          box-shadow:0 2px 8px rgba(0,0,0,.07);
         }
-        .error-bar { background:#fef2f2; border:1px solid #fecaca; border-radius:var(--radius-sm); padding:.6rem 1rem; font-size:.82rem; color:#dc2626; display:flex; align-items:center; justify-content:space-between; }
 
+        .error-bar {
+          background:#fef2f2; border:1px solid #fecaca;
+          border-radius:var(--radius-sm); padding:.6rem 1rem;
+          font-size:.82rem; color:#dc2626;
+          display:flex; align-items:center; justify-content:space-between;
+        }
+
+        /* ── Detail popup ── */
         .map-detail-overlay {
-          position: absolute; inset: 0; z-index: 1500;
-          display: flex; align-items: center; justify-content: center;
-          background: rgba(0, 0, 0, .32);
-          backdrop-filter: blur(2px);
-          animation: fadeIn .18s ease;
+          position:absolute; inset:0; z-index:1500;
+          display:flex; align-items:center; justify-content:center;
+          background:rgba(0,0,0,.3); backdrop-filter:blur(2px);
+          animation:fadeIn .18s ease;
         }
-        @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
         .map-detail-card {
-          background: var(--white);
-          border: 1px solid var(--border);
-          border-radius: var(--radius);
-          padding: 1.25rem 1.5rem;
-          width: 320px;
-          max-width: calc(100vw - 2rem);
-          box-shadow: 0 20px 60px rgba(0,0,0,.18);
-          animation: slideUp .2s ease;
+          background:#fffdf8;
+          border:1px solid rgba(0,0,0,.1);
+          border-radius:var(--radius);
+          padding:1.25rem 1.5rem;
+          width:320px; max-width:calc(100vw - 2rem);
+          box-shadow:0 20px 60px rgba(0,0,0,.16);
+          animation:slideUp .2s ease;
         }
-        @keyframes slideUp { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
-        .detail-country-header {
-          display:flex; align-items:center; gap:.75rem; margin-bottom:1rem;
-        }
+        @keyframes slideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+        .detail-country-header { display:flex; align-items:center; gap:.75rem; margin-bottom:1rem; }
         .detail-flag { width:36px; height:24px; object-fit:cover; border-radius:3px; flex-shrink:0; }
         .detail-country-name { font-size:1.05rem; font-weight:800; color:var(--gray-900); }
         .detail-close-btn {
-          margin-left: auto; background: none; border: none;
-          cursor: pointer; color: var(--gray-400); font-size: 1rem;
-          line-height: 1; padding: .2rem .4rem; border-radius: 4px;
-          transition: background .15s, color .15s;
+          margin-left:auto; background:none; border:none;
+          cursor:pointer; color:var(--gray-400); font-size:1rem;
+          line-height:1; padding:.2rem .4rem; border-radius:4px;
+          transition:background .15s, color .15s;
         }
-        .detail-close-btn:hover { background: var(--gray-100); color: var(--gray-700); }
-        .detail-rows { display: flex; flex-direction: column; }
+        .detail-close-btn:hover { background:var(--gray-100); color:var(--gray-700); }
+        .detail-rows { display:flex; flex-direction:column; }
         .detail-row {
           display:flex; justify-content:space-between; align-items:center;
           padding:.45rem 0; border-bottom:1px solid var(--border); font-size:.875rem;
         }
-        .detail-row:last-child { border-bottom: none; }
-        .detail-row-label { color: var(--gray-500); }
+        .detail-row:last-child { border-bottom:none; }
+        .detail-row-label { color:var(--gray-500); }
         .detail-row-val { font-weight:700; color:var(--gray-900); font-family:var(--font-mono); font-size:.85rem; }
       `}</style>
 
+      {/* Header */}
       <div className="map-header">
         <div>
           <div className="map-title">🗺 Live Outbreak Map</div>
@@ -317,10 +309,7 @@ export default function MapPage() {
       {error && (
         <div className="error-bar">
           <span>⚠ {error}</span>
-          <button
-            onClick={refetch}
-            style={{ background:"none", border:"none", cursor:"pointer", fontWeight:700, color:"#dc2626" }}
-          >
+          <button onClick={refetch} style={{ background:"none", border:"none", cursor:"pointer", fontWeight:700, color:"#dc2626" }}>
             Retry
           </button>
         </div>
@@ -345,15 +334,19 @@ export default function MapPage() {
             maxBounds={[[-90, -180], [90, 180]]}
             style={{ width:"100%", height:"100%", minHeight:520 }}
           >
+            {/*
+              Stadia Maps — Stamen Toner Lite
+              ─────────────────────────────────────────────────────────
+              Classic black-on-white cartographic aesthetic.
+              All labels (countries, continents, cities) are in English.
+              Free to use with attribution. No API key required.
+              URL pattern: /stamen_toner_lite/{z}/{x}/{y}{r}.png
+            */}
             <TileLayer
-              url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
-              attribution='© <a href="https://carto.com/">CARTO</a>'
-              subdomains="abcd"
-            />
-            <TileLayer
-              url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png"
-              subdomains="abcd"
-            />
+             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+              attribution='&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+               subdomains="abcd"
+/>
 
             {!loading && visibleCountries.map((c) => (
               <CircleMarker
@@ -363,17 +356,16 @@ export default function MapPage() {
                 pathOptions={{
                   color:       riskColor(c.risk),
                   fillColor:   riskColor(c.risk),
-                  fillOpacity: 0.65,
+                  fillOpacity: 0.72,
                   weight:      1.5,
-                  opacity:     0.9,
+                  opacity:     1,
                 }}
-                eventHandlers={{
-                  click: () => setSelected(c),
-                }}
+                eventHandlers={{ click: () => setSelected(c) }}
               />
             ))}
           </MapContainer>
 
+          {/* Floating detail card */}
           <DetailPopup
             selected={selected}
             isOwid={isOwid}
@@ -381,6 +373,7 @@ export default function MapPage() {
             onClose={() => setSelected(null)}
           />
 
+          {/* Legend */}
           <div className="map-legend">
             <div
               className="map-legend-title"
@@ -401,10 +394,7 @@ export default function MapPage() {
                       checked={activeRisks.has(label)}
                       onChange={() => toggleRisk(label)}
                     />
-                    <div
-                      className="legend-dot"
-                      style={{ background: color, opacity: activeRisks.has(label) ? 1 : 0.3 }}
-                    />
+                    <div className="legend-dot" style={{ background: color, opacity: activeRisks.has(label) ? 1 : 0.3 }} />
                     <span style={{ opacity: activeRisks.has(label) ? 1 : 0.4 }}>{label}</span>
                     <span className="legend-range">{range}</span>
                   </label>
