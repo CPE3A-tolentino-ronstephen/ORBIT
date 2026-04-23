@@ -237,7 +237,7 @@ export default function AuthPage() {
           display: flex;
           gap: 0;
           margin-bottom: 32px;
-          border: 1px solid var(--border);
+          border: 0px;
           border-radius: var(--radius-sm);
           overflow: hidden;
           background: var(--gray-50);
@@ -250,17 +250,17 @@ export default function AuthPage() {
           font-weight: 600;
           border: none;
           background: transparent;
-          color: var(--gray-500);
+          color: var(--gray-900);
           cursor: pointer;
           transition: all 0.15s;
         }
         .auth-tab-btn.active {
-          background: var(--white);
-          color: var(--gray-900);
+          background: var(--gray-900);
+          color: var(--gray-200);
           box-shadow: 0 1px 4px rgba(0,0,0,.08);
         }
         .auth-tab-btn:hover:not(.active) {
-          color: var(--gray-700);
+          color: var(--orbit-green-dim);
           background: var(--gray-100);
         }
 
