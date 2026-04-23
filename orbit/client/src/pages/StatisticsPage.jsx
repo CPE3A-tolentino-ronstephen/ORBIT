@@ -173,16 +173,16 @@ export default function StatisticsPage() {
       todayDeaths: fmt(src.todayDeaths),                 
       year:        src.year,                             
       updatedDate: (() => {
-     if (isCovid && yearlyHistorical?.length) {
-        const lastLabel = yearlyHistorical[yearlyHistorical.length - 1]?.label;
-        return lastLabel ?? null;
-      }
+        if (isCovid && yearlyHistorical?.length) {
+          const lastLabel = yearlyHistorical[yearlyHistorical.length - 1]?.label;
+          return lastLabel ?? null;
+        }
         return src.updated
-        ? new Date(src.updated).toLocaleDateString("en-US", { year:"numeric", month:"short", day:"numeric" })
-        : null;
+          ? new Date(src.updated).toLocaleDateString("en-US", { year:"numeric", month:"short", day:"numeric" })
+          : null;
       })(),
     };
-  }, [globalResolved, global, isHiv]);
+  }, [globalResolved, global, isHiv, isCovid, yearlyHistorical]);
 
   const tickFmt = (v) => {
     if (v >= 1_000_000) return (v / 1_000_000).toFixed(1) + "M";
@@ -200,6 +200,29 @@ export default function StatisticsPage() {
     if (isCovid) return 0;
     return 4;
   })();
+
+  // Custom label renderer for pie chart
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, name }) => {
+    const RADIAN = Math.PI / 180;
+    const radius = outerRadius * 1.1;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+    
+    if (percent < 0.05) return null;
+    
+    return (
+      <text 
+        x={x} 
+        y={y} 
+        fill="#374151" 
+        textAnchor={x > cx ? 'start' : 'end'} 
+        dominantBaseline="central"
+        style={{ fontSize: '11px', fontWeight: 500, fontFamily: 'var(--font-body)' }}
+      >
+        {`${name} ${(percent * 100).toFixed(0)}%`}
+      </text>
+    );
+  };
 
   return (
     <div className="stats-page page-enter">
@@ -263,7 +286,7 @@ export default function StatisticsPage() {
                 setActiveDisease(d.key);
               }}
             >
-              {d.icon} {d.label}
+              {d.label}
             </button>
           ))}
         </div>
@@ -464,14 +487,43 @@ export default function StatisticsPage() {
               {loading ? <NoData icon="" text="Loading…" /> : continentPie.length === 0 ? <NoData icon="" text="No continent data available" /> : (
                 <ResponsiveContainer width="100%" height={260}>
                   <PieChart>
-                    <Pie data={continentPie} cx="50%" cy="50%" outerRadius={90} dataKey="value" nameKey="name"
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
-                      {continentPie.map(({ name }) => (
-                        <Cell key={name} fill={CONTINENT_COLORS[name] ?? CONTINENT_COLORS.Other} />
+                    <Pie 
+                      data={continentPie} 
+                      cx="50%" 
+                      cy="50%" 
+                      outerRadius={90} 
+                      dataKey="value" 
+                      nameKey="name"
+                      labelLine={false}
+                      label={renderCustomizedLabel}
+                    >
+                      {continentPie.map(({ name }, index) => (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={CONTINENT_COLORS[name] ?? CONTINENT_COLORS.Other}
+                          stroke="white"
+                          strokeWidth={2}
+                        />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(v) => fmt(v)} contentStyle={{ fontFamily:"var(--font-body)", fontSize:".82rem" }} />
-                    <Legend wrapperStyle={{ fontSize:".8rem" }} />
+                    <Tooltip 
+                      formatter={(value) => fmt(value)} 
+                      contentStyle={{ 
+                        fontFamily:"var(--font-body)", 
+                        fontSize:".82rem",
+                        borderRadius:8,
+                        border:"1px solid #e5e7eb",
+                        boxShadow:"0 4px 16px rgba(0,0,0,.1)"
+                      }} 
+                    />
+                    <Legend 
+                      wrapperStyle={{ 
+                        fontSize:".8rem", 
+                        fontFamily:"var(--font-body)",
+                        paddingTop:"1rem"
+                      }}
+                      iconType="circle"
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               )}
