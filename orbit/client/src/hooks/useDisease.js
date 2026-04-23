@@ -1,14 +1,34 @@
 import { useState, useEffect, useCallback } from "react";
 import { DiseaseAPI, isOwidDisease }         from "../services/api";
 
-function normaliseOwidHistorical(data) {
+function normaliseOwidHistorical(data, disease) {
   if (!Array.isArray(data)) return [];
   return data.map((row) => ({
     label:            String(row.year),
     cases:            row.cases            ?? 0,
     deaths:           row.deaths           ?? 0,
-    caseFatalityRate: row.caseFatalityRate  ?? 0,
+    caseFatalityRate: disease === "hiv"
+      ? (row.deaths > 0 ? parseFloat((row.cases / row.deaths).toFixed(4)) : 0)
+      : (row.caseFatalityRate ?? 0),
   }));
+}
+
+function normaliseCovidYearlyHistorical(data) {
+  if (!Array.isArray(data)) return [];
+  const sorted = [...data].sort((a, b) => Number(a.year) - Number(b.year));
+  return sorted.map((row, i) => {
+    const prev       = sorted[i - 1];
+    const rawCases   = row.cases  ?? 0;
+    const rawDeaths  = row.deaths ?? 0;
+    const prevCases  = prev ? (prev.cases  ?? 0) : 0;
+    const prevDeaths = prev ? (prev.deaths ?? 0) : 0;
+    return {
+      label:  String(row.year),
+      cases:  Math.max(0, rawCases  - prevCases),
+      deaths: Math.max(0, rawDeaths - prevDeaths),
+      caseFatalityRate: 0,
+    };
+  });
 }
 
 function normaliseCovidHistorical(data) {
@@ -68,11 +88,26 @@ export function useDisease(disease = "covid19", options = {}) {
           : DiseaseAPI.getHistorical(disease, { days   }).catch(() => null),
       ]);
 
-      setGlobal(g);
-      setCountries(Array.isArray(c) ? c : []);
+      setGlobal(
+         g && disease === "hiv" 
+         ? { ...g, caseFatalityRate: g.deaths > 0 ? parseFloat((g.cases / g.deaths).toFixed(4)) : 0 }
+         : g
+      );
+      setCountries(
+         Array.isArray(c)
+         ? disease === "hiv" 
+         ? c.map(row => ({
+          ...row,
+          caseFatalityRate: row.deaths > 0 ? parseFloat((row.cases / row.deaths).toFixed(4)) : 0,
+        }))
+      : c
+    : []
+);
 
-      if (owid) {
-        setHistorical(normaliseOwidHistorical(h));
+      if (disease === "covid19_yearly") {
+        setHistorical(normaliseCovidYearlyHistorical(h));
+      } else if (owid) {
+        setHistorical(normaliseOwidHistorical(h, disease));
       } else {
         setHistorical(normaliseCovidHistorical(h));
       }
@@ -119,9 +154,11 @@ export function useDisease(disease = "covid19", options = {}) {
           : await DiseaseAPI.getHistorical(disease, { days });
 
         setHistorical(
-          owid
-            ? normaliseOwidHistorical(h)
-            : normaliseCovidHistorical(h)
+          disease === "covid19_yearly"
+          ? normaliseCovidYearlyHistorical(h)
+          : owid
+          ? normaliseOwidHistorical(h, disease)
+          : normaliseCovidHistorical(h)
         );
       } catch (e) {
         console.error("selectHistorical:", e.message);
