@@ -552,7 +552,7 @@ export default function AuthPage() {
         {tab === "signin" && (
           <form onSubmit={handleSignIn} noValidate>
             <div className="form-field">
-              <label className="form-label">Email address</label>
+              <label className="form-label">Email Address</label>
               <input
                 className="form-input"
                 type="email"
@@ -605,7 +605,7 @@ export default function AuthPage() {
             )}
 
             <div className="form-field">
-              <label className="form-label">Full name</label>
+              <label className="form-label">Full Name</label>
               <input
                 className="form-input"
                 type="text"
@@ -618,7 +618,7 @@ export default function AuthPage() {
             </div>
 
             <div className="form-field">
-              <label className="form-label">Email address</label>
+              <label className="form-label">Email Address</label>
               <input
                 className="form-input"
                 type="email"
@@ -654,7 +654,7 @@ export default function AuthPage() {
             </div>
 
             <div className="form-field">
-              <label className="form-label">Confirm password</label>
+              <label className="form-label">Confirm Password</label>
               <input
                 className="form-input"
                 type={showPass ? "text" : "password"}

@@ -646,7 +646,7 @@ export default function LandingPage() {
           </div>
           <div className="feature-card">
   
-            <h3>Risk Scoring</h3>
+            <h3>Risk Scoring Analysis</h3>
             <p>Every country receives a 0–100 risk score computed from case density, mortality rate, and active case trajectory.</p>
           </div>
           <div className="feature-card">
