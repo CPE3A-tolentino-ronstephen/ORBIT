@@ -4,13 +4,13 @@ import { useAuth }            from "../context/AuthContext";
 import { useDisease }         from "../hooks/useDisease";
 
 const DISEASES = [
-  { key: "covid19",      label: "COVID-19",     icon: "", color: "#3b82f6" },
-  { key: "tuberculosis", label: "Tuberculosis", icon: "", color: "#7c3aed" },
-  { key: "malaria",      label: "Malaria",      icon: "", color: "#16a34a" },
-  { key: "hiv",          label: "HIV/AIDS",     icon: "", color: "#dc2626" },
-  { key: "mpox",         label: "Mpox",         icon: "", color: "#8b5cf6" },
-  { key: "cholera",      label: "Cholera",      icon: "", color: "#0891b2" },
-  { key: "measles",      label: "Measles",      icon: "", color: "#db2777" },
+  { key: "covid19",      label: "COVID-19",      color: "#3b82f6" },
+  { key: "tuberculosis", label: "Tuberculosis",  color: "#7c3aed" },
+  { key: "malaria",      label: "Malaria",       color: "#16a34a" },
+  { key: "hiv",          label: "HIV/AIDS",      color: "#dc2626" },
+  { key: "mpox",         label: "Mpox",          color: "#8b5cf6" },
+  { key: "cholera",      label: "Cholera",       color: "#0891b2" },
+  { key: "measles",      label: "Measles",       color: "#db2777" },
 ];
 
 function fmt(n) {
@@ -140,7 +140,9 @@ function DetailPanel({ selected, isOwid, activeDisease, onClose }) {
     );
   }
 
-  const isHiv = activeDisease === "hiv";
+  const isHiv  = activeDisease === "hiv";
+  const isCovid = activeDisease === "covid19"; 
+  const rateLabel = isHiv ? "Infection-to-Death Ratio" : "Case Fatality Rate";
 
   const baseRows = [
     {
@@ -152,8 +154,10 @@ function DetailPanel({ selected, isOwid, activeDisease, onClose }) {
       val:   fmt(selected.deaths),
     },
     {
-      label: "Mortality Rate",
-      val:   fmtPct(selected.caseFatalityRate),
+      label: rateLabel, 
+      val:   isHiv
+        ? Number(selected.caseFatalityRate).toFixed(2)
+        : fmtPct(selected.caseFatalityRate),
     },
     ...(!isHiv
       ? [{ label: "Cases / 1M pop", val: fmt(selected.casesPerMillion) }]
@@ -243,7 +247,9 @@ export default function DashboardPage() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
-  const isHiv = activeDisease === "hiv";
+  const isHiv   = activeDisease === "hiv";
+  const isCovid = activeDisease === "covid19"; 
+  const rateLabel = isHiv ? "Infection-to-Death Ratio" : "Case Fatality Rate"; 
 
   const globalStats = useMemo(() => {
     if (!global) return {};
@@ -251,13 +257,16 @@ export default function DashboardPage() {
     return {
       cases:    fmt(global.cases),
       deaths:   fmt(global.deaths),
-      cfr:      fmtPct(global.caseFatalityRate),
+       cfr:      isHiv
+        ? Number(global.caseFatalityRate).toFixed(2)
+        : fmtPct(global.caseFatalityRate),
       recovered: fmt(global.recovered),
       active:   fmt(global.active),
       critical: fmt(global.critical),
       dataYear: dataYear ? `Data as of ${dataYear}` : null,
     };
-  }, [global]);
+  }, [global, isHiv]);
+
 
   return (
     <div className="dashboard page-enter">
@@ -399,9 +408,9 @@ export default function DashboardPage() {
         />
         {activeDisease !== "covid19" && (
           <StatCard
-            label="Mortality Rate"
+            label={rateLabel} 
             value={globalStats.cfr}
-            sub={isHiv ? "annual deaths ÷ new infections" : "deaths ÷ cases"}
+            sub={isHiv ? "new infections ÷ death" : "deaths ÷ cases"}
             accent="#f59e0b"
             loading={loading}
           />
@@ -457,7 +466,7 @@ export default function DashboardPage() {
             >
               <option value="cases">Sort: Cases</option>
               <option value="deaths">Sort: Deaths</option>
-              <option value="caseFatalityRate">Sort: Mortality Rate</option>
+              <option value="caseFatalityRate">{isHiv ? "Sort: Infection-to-Death Ratio" : "Sort: Case Fatality Rate"}</option>
               <option value="riskScore">Sort: Risk</option>
             </select>
           </div>
@@ -494,7 +503,7 @@ export default function DashboardPage() {
                     <th className="hide-mobile">
                       {isHiv ? "Annual Deaths" : "Deaths"}
                     </th>
-                    <th className="hide-mobile">Mortality</th>
+                    <th className="hide-mobile">{isHiv ? "Infection-to-Death Ratio" : "Case Fatality Rate"}</th>
                     <th>Risk</th>
                   </tr>
                 </thead>
@@ -529,7 +538,6 @@ export default function DashboardPage() {
         </div>
 
         <div className="detail-panel">
-
           <div className="map-cta">
             <div style={{ fontSize: "1.5rem" }}>🗺</div>
             <h4>View Interactive Map</h4>
