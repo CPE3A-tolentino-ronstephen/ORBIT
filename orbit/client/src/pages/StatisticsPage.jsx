@@ -58,7 +58,7 @@ function CustomTooltip({ active, payload, label }) {
   );
 }
 
-function NoData({ icon = "📭", text = "No data available" }) {
+function NoData({ icon = "", text = "No data available" }) {
   return (
     <div style={{
       display:"flex", alignItems:"center", justifyContent:"center",
@@ -191,8 +191,8 @@ export default function StatisticsPage() {
   };
 
   const trendTitle = isCovid
-    ? "📈 Yearly Trend — New Cases & Deaths Per Year (Global)"
-    : "📈 Yearly Trend — Cases & Deaths (Global)";
+    ? "Yearly Trend — New Cases & Deaths Per Year (Global)"
+    : "Yearly Trend — Cases & Deaths (Global)";
 
   const xAxisInterval = (() => {
     if (!isOwid && !isCovid) return "preserveStartEnd";
@@ -238,7 +238,7 @@ export default function StatisticsPage() {
 
       <div className="stats-header">
         <div>
-          <div className="stats-title">📊 Statistical Analysis</div>
+          <div className="stats-title">Statistical Analysis</div>
           <div style={{ display:"flex", alignItems:"center", gap:".5rem", marginTop:".2rem" }}>
             <span style={{ fontSize:".85rem", color:"var(--gray-400)" }}>
               {loading ? "Loading…" : `${countries.length} countries loaded`}
@@ -346,9 +346,9 @@ export default function StatisticsPage() {
             {trendTitle}
           </div>
           {trendLoading ? (
-            <NoData icon="⏳" text="Loading trend data…" />
+            <NoData icon="" text="Loading trend data…" />
           ) : trendData.length === 0 ? (
-            <NoData icon="📅" text="No historical data available" />
+            <NoData icon="" text="No historical data available" />
           ) : (
             <ResponsiveContainer width="100%" height={260}>
               <AreaChart data={trendData} margin={{ top:4, right:16, left:0, bottom:0 }}>
@@ -390,7 +390,7 @@ export default function StatisticsPage() {
 
         <div className="chart-card">
           <div className="chart-title">
-            🏆 Top Countries by {isHiv ? "New Infections" : "Cases"}
+            Top Countries by {isHiv ? "New Infections" : "Cases"}
             <div style={{ display:"flex", gap:".4rem", marginLeft:"auto" }}>
               {[5, 10].map(n => (
                 <button key={n} className={`n-btn ${topN === n ? "active" : ""}`} onClick={() => setTopN(n)}>Top {n}</button>
@@ -414,14 +414,14 @@ export default function StatisticsPage() {
           {isOwid && !isHiv ? (
             <>
               <div className="chart-title">
-                ☠️ Top Countries by {rateLabel}
+                 Top Countries by {rateLabel}
                 <div style={{ display:"flex", gap:".4rem", marginLeft:"auto" }}>
                   {[5, 10].map(n => (
                     <button key={n} className={`n-btn ${topN === n ? "active" : ""}`} onClick={() => setTopN(n)}>Top {n}</button>
                   ))}
                 </div>
               </div>
-              {loading ? <NoData icon="⏳" text="Loading…" /> : topByMortality.length === 0 ? <NoData icon="📊" text="No data available" /> : (
+              {loading ? <NoData icon="⏳" text="Loading…" /> : topByMortality.length === 0 ? <NoData icon="" text="No data available" /> : (
                 <ResponsiveContainer width="100%" height={260}>
                   <BarChart data={topByMortality} layout="vertical" margin={{ top:0, right:16, left:0, bottom:0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" horizontal={false} />
@@ -436,14 +436,14 @@ export default function StatisticsPage() {
           ) : isHiv ? (
             <>
               <div className="chart-title">
-                ☠️ Top Countries by Annual Deaths
+                 Top Countries by Annual Deaths
                 <div style={{ display:"flex", gap:".4rem", marginLeft:"auto" }}>
                   {[5, 10].map(n => (
                     <button key={n} className={`n-btn ${topN === n ? "active" : ""}`} onClick={() => setTopN(n)}>Top {n}</button>
                   ))}
                 </div>
               </div>
-              {loading ? <NoData icon="⏳" text="Loading…" /> : countries.length === 0 ? <NoData icon="📊" text="No data available" /> : (
+              {loading ? <NoData icon="" text="Loading…" /> : countries.length === 0 ? <NoData icon="" text="No data available" /> : (
                 <ResponsiveContainer width="100%" height={260}>
                   <BarChart
                     data={[...countries].filter(c => c.deaths > 0).sort((a, b) => b.deaths - a.deaths).slice(0, topN)}
@@ -460,8 +460,8 @@ export default function StatisticsPage() {
             </>
           ) : (
             <>
-              <div className="chart-title">🌍 Cases by Continent</div>
-              {loading ? <NoData icon="⏳" text="Loading…" /> : continentPie.length === 0 ? <NoData icon="🌐" text="No continent data available" /> : (
+              <div className="chart-title">Cases by Continent</div>
+              {loading ? <NoData icon="" text="Loading…" /> : continentPie.length === 0 ? <NoData icon="" text="No continent data available" /> : (
                 <ResponsiveContainer width="100%" height={260}>
                   <PieChart>
                     <Pie data={continentPie} cx="50%" cy="50%" outerRadius={90} dataKey="value" nameKey="name"
@@ -480,7 +480,7 @@ export default function StatisticsPage() {
         </div>
 
         <div className="chart-card">
-          <div className="chart-title">⚡ Risk Distribution</div>
+          <div className="chart-title">Risk Distribution</div>
           <div className="risk-dist" style={{ paddingTop:".5rem" }}>
             {riskBands.map(({ label, color, count }) => (
               <div className="risk-dist-row" key={label}>
