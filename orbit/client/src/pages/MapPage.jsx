@@ -23,8 +23,10 @@ const RISK_LEVELS = [
   { label: "Minimal",  color: "#94a3b8", range: "0–4"    },
 ];
 
+
+
 function fmt(n) {
-  if (n == null || n === 0) return "—";
+  if (n == null) return "—";
   const num = Number(n);
   if (isNaN(num)) return "—";
   if (num >= 1_000_000) return (num / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
@@ -33,7 +35,7 @@ function fmt(n) {
 }
 
 function fmtPct(n) {
-  if (n == null || n === 0) return "—";
+  if (n == null) return "—";
   return `${Number(n).toFixed(2)}%`;
 }
 
@@ -56,26 +58,37 @@ function circleRadius(cases, maxCases) {
 function DetailPopup({ selected, isOwid, activeDisease, onClose }) {
   if (!selected) return null;
 
-  const isHiv = activeDisease === "hiv";
+  const isHiv       = activeDisease === "hiv";
+  const rateLabel   = isHiv ? "Infection-to-Death Ratio" : "Case Fatality Rate";
+
+  // disease.sh doesn't always expose caseFatalityRate directly — derive it if missing
+  const derivedCFR = selected.caseFatalityRate != null
+    ? selected.caseFatalityRate
+    : (selected.cases && selected.deaths)
+      ? (selected.deaths / selected.cases) * 100
+      : null;
 
   const baseRows = [
     { label: isHiv ? "New Infections" : "Total Cases", val: fmt(selected.cases) },
     { label: isHiv ? "Annual Deaths"  : "Deaths",      val: fmt(selected.deaths) },
-    { label: "Mortality Rate",                          val: fmtPct(selected.caseFatalityRate) },
-    ...(!isHiv ? [{ label: "Cases / 1M pop", val: fmt(selected.casesPerMillion) }] : []),
+    { label: "Risk Score", val: `${selected.riskScore ?? "—"} / 100` },
   ];
 
   const covidRows = [
-    { label: "Recovered",       val: fmt(selected.recovered) },
-    { label: "Active Cases",    val: fmt(selected.active) },
-    { label: "Critical",        val: fmt(selected.critical) },
-    { label: "Deaths / 1M pop", val: fmt(selected.deathsPerMillion) },
-    { label: "Today + Cases",   val: fmt(selected.todayCases) },
+    { label: "Recovered",          val: fmt(selected.recovered) },
+    { label: "Active Cases",       val: fmt(selected.active) },
+    { label: "Critical",           val: fmt(selected.critical) },
+    { label: "Deaths / 1M pop",    val: fmt(selected.deathsPerMillion) },
+    { label: "Case Fatality Rate", val: fmtPct(derivedCFR) },
   ];
 
   const owidRows = [
+    { label: rateLabel, val: isHiv
+        ? (derivedCFR != null ? Number(derivedCFR).toFixed(2) : "—")
+        : fmtPct(derivedCFR) },
     { label: "Data Year", val: selected.year ?? "—" },
-    { label: "Source",    val: selected.source ?? "OWID / WHO" },
+    { label: "Continent",  val: selected.continent ?? "—" },
+    { label: "Source",     val: "OWID / WHO" },
   ];
 
   const rows = isOwid ? [...baseRows, ...owidRows] : [...baseRows, ...covidRows];
@@ -95,6 +108,18 @@ function DetailPopup({ selected, isOwid, activeDisease, onClose }) {
           </div>
           <button onClick={onClose} className="detail-close-btn" aria-label="Close">✕</button>
         </div>
+
+        {/* Risk score progress bar */}
+        <div style={{ height: 5, borderRadius: 99, background: "var(--gray-100)",
+                      overflow: "hidden", marginBottom: "1rem" }}>
+          <div style={{
+            height: "100%", borderRadius: 99,
+            width: `${selected.riskScore ?? 0}%`,
+            background: riskColor(selected.risk),
+            transition: "width .5s ease",
+          }} />
+        </div>
+
         <div className="detail-rows">
           {rows.map(({ label, val }) => (
             <div className="detail-row" key={label}>
@@ -114,7 +139,7 @@ export default function MapPage() {
   const [showLegend,    setShowLegend]    = useState(false);
   const [selected,      setSelected]      = useState(null);
 
-  const { countries, loading, error, isOwid, refetch } = useDisease(activeDisease);
+  const { countries, loading, error, isOwid, refetch, global } = useDisease(activeDisease);
 
   const mappableCountries = useMemo(() => {
     if (!countries.length) return [];
@@ -149,12 +174,15 @@ export default function MapPage() {
   };
 
   const allChecked = activeRisks.size === RISK_LEVELS.length;
-
-  const subText = loading
+  const provider  = isOwid ? "OWID / WHO" : "disease.sh";
+  const dataYear  = global?.year ?? global?.dataYear ?? null;
+  const subText   = loading
     ? "Loading data…"
     : error
     ? "Error loading data"
-    : `${visibleCountries.length} of ${mappableCountries.length} countries · ${isOwid ? "OWID / WHO annual data" : "disease.sh real-time"}`;
+    : dataYear
+      ? `Data as of ${dataYear} · ${provider}`
+      : `${provider} · real-time`;
 
   return (
     <div className="map-page page-enter">
@@ -177,7 +205,6 @@ export default function MapPage() {
           position:relative; border-radius:var(--radius);
           overflow:hidden; border:1px solid var(--border);
           min-height:520px;
-          /* Warm off-white background matches Toner Lite ocean color */
           background:#f5f0e8;
         }
         .leaflet-container { width:100%; height:100%; min-height:520px; border-radius:var(--radius); }
@@ -186,8 +213,6 @@ export default function MapPage() {
           background:rgba(255,255,255,.75) !important;
           backdrop-filter:blur(4px);
         }
-
-        /* ── Loading overlay ── */
         .map-loading {
           position:absolute; inset:0; z-index:2000;
           display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -202,8 +227,6 @@ export default function MapPage() {
           border-radius:50%; animation:spin .8s linear infinite;
         }
         .map-loading p { font-size:14px; color:var(--gray-500); font-family:var(--font-mono); }
-
-        /* ── Legend ── */
         .map-legend {
           position:absolute; bottom:1.5rem; left:1rem;
           background:rgba(255,253,248,.97); backdrop-filter:blur(8px);
@@ -232,7 +255,6 @@ export default function MapPage() {
           margin-bottom:.4rem; font-weight:700; text-decoration:underline;
         }
 
-        /* ── Tip ── */
         .map-tip {
           position:absolute; bottom:1.5rem; right:1rem;
           background:rgba(255,253,248,.92); backdrop-filter:blur(6px);
@@ -249,7 +271,6 @@ export default function MapPage() {
           display:flex; align-items:center; justify-content:space-between;
         }
 
-        /* ── Detail popup ── */
         .map-detail-overlay {
           position:absolute; inset:0; z-index:1500;
           display:flex; align-items:center; justify-content:center;
@@ -267,7 +288,7 @@ export default function MapPage() {
           animation:slideUp .2s ease;
         }
         @keyframes slideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-        .detail-country-header { display:flex; align-items:center; gap:.75rem; margin-bottom:1rem; }
+        .detail-country-header { display:flex; align-items:center; gap:.75rem; margin-bottom:.75rem; }
         .detail-flag { width:36px; height:24px; object-fit:cover; border-radius:3px; flex-shrink:0; }
         .detail-country-name { font-size:1.05rem; font-weight:800; color:var(--gray-900); }
         .detail-close-btn {
