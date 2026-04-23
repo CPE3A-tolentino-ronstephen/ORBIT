@@ -8,13 +8,13 @@ import { useDisease }                  from "../hooks/useDisease";
 import { enrichCountriesWithCoords }   from "../utils/countryCoordinates";
 
 const DISEASES = [
-  { key: "covid19",      label: "COVID-19",     icon: "🦠" },
-  { key: "tuberculosis", label: "Tuberculosis", icon: "🫁" },
-  { key: "malaria",      label: "Malaria",      icon: "🦟" },
-  { key: "hiv",          label: "HIV/AIDS",     icon: "🔴" },
-  { key: "mpox",         label: "Mpox",         icon: "🧬" },
-  { key: "cholera",      label: "Cholera",      icon: "💧" },
-  { key: "measles",      label: "Measles",      icon: "⚕️" },
+  { key: "covid19",      label: "COVID-19",      },
+  { key: "tuberculosis", label: "Tuberculosis",  },
+  { key: "malaria",      label: "Malaria",       },
+  { key: "hiv",          label: "HIV/AIDS",     },
+  { key: "mpox",         label: "Mpox",         },
+  { key: "cholera",      label: "Cholera",      },
+  { key: "measles",      label: "Measles",      },
 ];
 
 const CONTINENT_COLORS = {
@@ -63,14 +63,14 @@ function CustomTooltip({ active, payload, label }) {
   );
 }
 
-function NoData({ icon = "📭", text = "No data available" }) {
+function NoData({ text = "No data available" }) {
   return (
     <div style={{
       display: "flex", alignItems: "center", justifyContent: "center",
       height: 200, color: "var(--gray-400)", fontSize: 14,
       textAlign: "center", flexDirection: "column", gap: 8,
     }}>
-      <span style={{ fontSize: 24 }}>{icon}</span>
+      <span style={{ fontSize: 24 }}>📭</span>
       {text}
     </div>
   );
@@ -247,7 +247,7 @@ export default function StatisticsPage() {
               className={`stats-tab ${activeDisease === d.key ? "active" : ""}`}
               onClick={() => { setActiveDisease(d.key); setCovidYearly(false); }}
             >
-              {d.icon} {d.label}
+             {d.label}
             </button>
           ))}
         </div>
@@ -345,9 +345,9 @@ export default function StatisticsPage() {
             )}
           </div>
           {trendLoading ? (
-            <NoData icon="⏳" text="Loading trend data…" />
+            <NoData text="Loading trend data…" />
           ) : !trendData?.length ? (
-            <NoData icon="📅" text="No historical data available" />
+            <NoData text="No historical data available" />
           ) : (
             <ResponsiveContainer width="100%" height={260}>
               <AreaChart data={trendData} margin={{ top:4, right:16, left:0, bottom:0 }}>
@@ -397,7 +397,7 @@ export default function StatisticsPage() {
               ))}
             </div>
           </div>
-          {loading ? <NoData icon="⏳" text="Loading…" /> : topCountries.length === 0 ? <NoData icon="🏳" text="No country data loaded" /> : (
+          {loading ? <NoData text="Loading…" /> : topCountries.length === 0 ? <NoData text="No country data loaded" /> : (
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={topCountries} layout="vertical" margin={{ top:0, right:16, left:0, bottom:0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" horizontal={false} />
@@ -422,7 +422,7 @@ export default function StatisticsPage() {
                   ))}
                 </div>
               </div>
-              {loading ? <NoData icon="⏳" text="Loading…" /> : topByMortality.length === 0 ? <NoData icon="📊" text="No mortality data available" /> : (
+              {loading ? <NoData text="Loading…" /> : topByMortality.length === 0 ? <NoData text="No mortality data available" /> : (
                 <ResponsiveContainer width="100%" height={260}>
                   <BarChart data={topByMortality} layout="vertical" margin={{ top:0, right:16, left:0, bottom:0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" horizontal={false} />
@@ -444,7 +444,7 @@ export default function StatisticsPage() {
                   ))}
                 </div>
               </div>
-              {loading ? <NoData icon="⏳" text="Loading…" /> : countries.length === 0 ? <NoData icon="📊" text="No data available" /> : (
+              {loading ? <NoData text="Loading…" /> : countries.length === 0 ? <NoData text="No data available" /> : (
                 <ResponsiveContainer width="100%" height={260}>
                   <BarChart
                     data={[...countries].filter(c => c.deaths > 0).sort((a,b) => b.deaths - a.deaths).slice(0, topN)}
@@ -463,27 +463,49 @@ export default function StatisticsPage() {
           ) : (
             <>
               <div className="chart-title">🌍 Cases by Continent</div>
-              {loading ? <NoData icon="⏳" text="Loading…" /> : continentPie.length === 0 ? <NoData icon="🌐" text="No continent data available" /> : (
-                <ResponsiveContainer width="100%" height={260}>
-                  <PieChart>
-                    <Pie
-                      data={continentPie}
-                      cx="50%" cy="50%"
-                      outerRadius={90}
-                      dataKey="value"
-                      nameKey="name"
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      labelLine={false}
-                    >
-                      {continentPie.map(({ name }) => (
-                        <Cell key={name} fill={CONTINENT_COLORS[name] ?? CONTINENT_COLORS.Other} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={v => fmt(v)} contentStyle={{ fontFamily:"var(--font-body)", fontSize:".82rem" }} />
-                    <Legend wrapperStyle={{ fontSize:".8rem" }} />
-                  </PieChart>
-                </ResponsiveContainer>
-              )}
+              {loading ? <NoData text="Loading…" /> : continentPie.length === 0 ? <NoData text="No continent data available" /> : (() => {
+                const total = continentPie.reduce((s, c) => s + c.value, 0);
+                const sorted = [...continentPie].sort((a, b) => a.name.localeCompare(b.name));
+                return (
+                  <div style={{ display:"flex", alignItems:"center", gap:"1rem", height:260 }}>
+                    {/* Left: vertical legend sorted alphabetically */}
+                    <div style={{ display:"flex", flexDirection:"column", gap:".6rem", minWidth:155, justifyContent:"center", height:"100%" }}>
+                      {sorted.map(({ name, value }) => {
+                        const pct = total > 0 ? ((value / total) * 100).toFixed(1) : "0.0";
+                        const color = CONTINENT_COLORS[name] ?? CONTINENT_COLORS.Other;
+                        return (
+                          <div key={name} style={{ display:"flex", alignItems:"center", gap:".45rem", fontSize:".8rem" }}>
+                            <span style={{ width:10, height:10, borderRadius:"50%", background:color, flexShrink:0 }} />
+                            <span style={{ color:"var(--gray-700)", fontWeight:600, flex:1, whiteSpace:"nowrap" }}>{name}</span>
+                            <span style={{ fontFamily:"var(--font-mono)", color:"var(--gray-400)", fontSize:".75rem", marginLeft:"auto" }}>{pct}%</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {/* Right: pie chart only, no built-in labels or legend */}
+                    <div style={{ flex:1, height:"100%" }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={continentPie}
+                            cx="50%" cy="50%"
+                            outerRadius={105}
+                            dataKey="value"
+                            nameKey="name"
+                            label={false}
+                            labelLine={false}
+                          >
+                            {continentPie.map(({ name }) => (
+                              <Cell key={name} fill={CONTINENT_COLORS[name] ?? CONTINENT_COLORS.Other} />
+                            ))}
+                          </Pie>
+                          <Tooltip formatter={v => fmt(v)} contentStyle={{ fontFamily:"var(--font-body)", fontSize:".82rem" }} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                );
+              })()}
             </>
           )}
         </div>
