@@ -511,7 +511,7 @@ export default function DashboardPage() {
                       </td>
                     </tr>
                   ) : (
-                    filtered.slice(0, 100).map((c, i) => (
+                    filtered.map((c, i) => (
                       <CountryRow
                         key={(c.countryCode || c.country) + i}
                         item={c}
