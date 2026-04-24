@@ -173,16 +173,14 @@ export default function StatisticsPage() {
       todayDeaths: fmt(src.todayDeaths),                 
       year:        src.year,                             
       updatedDate: (() => {
-     if (isCovid && yearlyHistorical?.length) {
-        const lastLabel = yearlyHistorical[yearlyHistorical.length - 1]?.label;
-        return lastLabel ?? null;
-      }
-        return src.updated
-          ? new Date(src.updated).toLocaleDateString("en-US", { year:"numeric", month:"short", day:"numeric" })
-          : null;
+        if (isCovid) {
+          const lastLabel = yearlyHistorical?.[yearlyHistorical.length - 1]?.label;
+          return lastLabel ?? null;
+        }
+        return null;
       })(),
     };
-  }, [globalResolved, global, isHiv]);
+  }, [globalResolved, global, isHiv, isCovid, yearlyHistorical]);
 
   const tickFmt = (v) => {
     if (v >= 1_000_000) return (v / 1_000_000).toFixed(1) + "M";
