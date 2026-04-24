@@ -417,30 +417,30 @@ export default function DashboardPage() {
         )}
   
         {!isOwid && (
-          <>
-            <StatCard
-              label="Recovered"
-              value={globalStats.recovered}
-              sub="cumulative"
-              accent="#10b981"
-              loading={loading}
-            />
-            <StatCard
-              label="Active Cases"
-              value={globalStats.active}
-              sub="currently infected"
-              accent="#f59e0b"
-              loading={loading}
-            />
-            <StatCard
-              label="Critical"
-              value={globalStats.critical}
-              sub="in serious condition"
-              accent="#ef4444"
-              loading={loading}
-            />
-          </>
-        )}
+  <>
+    <StatCard
+      label="Recovered"
+      value={globalStats.recovered}
+      sub="cumulative"
+      accent="#10b981"
+      loading={loading}
+    />
+    <StatCard
+      label={isCovid ? "Case Fatality Rate" : "Active Cases"}
+      value={isCovid ? globalStats.cfr : globalStats.active}
+      sub={isCovid ? "deaths / cases" : "currently infected"}
+      accent="#f59e0b"
+      loading={loading}
+    />
+    <StatCard
+      label="Critical"
+      value={globalStats.critical}
+      sub="in serious condition"
+      accent="#ef4444"
+      loading={loading}
+    />
+  </>
+)}
       </div>
 
       <div className="dash-body">
