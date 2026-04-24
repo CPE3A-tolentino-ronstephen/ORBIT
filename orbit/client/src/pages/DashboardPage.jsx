@@ -406,15 +406,15 @@ export default function DashboardPage() {
           accent="#dc2626"
           loading={loading}
         />
-        {activeDisease !== "covid19" && (
-          <StatCard
-            label={rateLabel} 
-            value={globalStats.cfr}
-            sub={isHiv ? "new infections ÷ death" : "deaths ÷ cases"}
-            accent="#f59e0b"
-            loading={loading}
-          />
-        )}
+        {!isCovid && (
+        <StatCard
+          label={rateLabel} 
+          value={globalStats.cfr}
+          sub={isHiv ? "new infections ÷ death" : "deaths ÷ cases"}
+          accent="#f59e0b"
+          loading={loading}
+        />
+      )}
   
         {!isOwid && (
   <>
