@@ -61,6 +61,7 @@ export default function Footer() {
       </div>
       <div className="footer-right">
         <a href="https://disease.sh" target="_blank" rel="noreferrer" className="footer-link">disease.sh</a>
+        <a href="https://ourworldindata.org/" target="_blank" rel="noreferrer" className="footer-link">OWID</a>
         <a href="https://www.who.int/data/gho" target="_blank" rel="noreferrer" className="footer-link">WHO | GHO</a>
       </div>
     </footer>
