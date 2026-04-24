@@ -86,8 +86,54 @@ https://orbitdetection.com/api
 
 ### Disease Data API
 
-The Disease API provides real-time and historical data for different diseases. It integrates external data sources and computes risk scores automatically.
+The Disease API provides real-time and historical data for different diseases. The system utilizes the following API structure to fetch and display biological intelligence and outbreak data.
 
+### DiseaseAPI Methods
+```
+
+| Method 		               | URL Endpoint	 		                        | Returns | Description 			                        |
+| :------------------------| :----------------------------------------| :-------| :-----------------------------------------|
+| `getSources()`	         | `GET /api/disease/sources` 	            | `List`  | List of all diseases + their capabilities |
+| `getGlobal(disease)` 	   | `GET /api/disease/{disease}/global`      | `Object`| Total cases, deaths, etc. (Global)        |
+| `getCountries(disease)`  | `GET /api/disease/{disease}/countries`   | `Array` | Array of per-country records 	            |
+| `getCountry(disease, id)`| `GET /api/disease/{disease}/country/{id}`| `Object`| Single country record (e.g., PHL)         |
+| `getHistorical(disease)` | `GET /api/disease/{disease}/historical`  | `Array` | Yearly trend array 			                  |
+| `getDeathRate(disease)`  | `GET /api/disease/{disease}/deathrate`   | `Array` | Per-100k death rate rows 		              |
+| `getContinents(disease)` | `GET /api/disease/{disease}/continents`  | `Object`| Continent-level aggregates (COVID only)   |
+```
+To ensure successful data retrieval, use the following parameter formats:
+
+* **{disease}**: Use the disease slug (e.g., `covid19`, `measles`, `tuberculosis`).
+* **{id}**: Use the ISO 3166-1 alpha-3 country code (e.g., `PHL` for Philippines).
+* **entity**: For historical queries, use `entity=World` to get global trends.
+
+#### Example Usage
+
+**Fetch COVID-19 data for the Philippines:**
+`GET /api/disease/covid19/country/PHL`
+
+**Fetch Tuberculosis historical trends:**
+`GET /api/disease/tuberculosis/historical?entity=World`
+---
+
+#### **Query Parameters & Identifiers**
+---
+
+#### **Query Parameters & Identifiers**
+
+To ensure successful data retrieval, use the following parameter formats:
+
+* **{disease}**: Use the disease slug (e.g., `covid19`, `measles`, `tuberculosis`).
+* **{id}**: Use the ISO 3166-1 alpha-3 country code (e.g., `PHL` for Philippines).
+* **entity**: For historical queries, use `entity=World` to get global trends.
+
+#### Example Usage
+
+**Fetch COVID-19 data for the Philippines:**
+`GET /api/disease/covid19/country/PHL`
+
+**Fetch Tuberculosis historical trends:**
+`GET /api/disease/tuberculosis/historical?entity=World`
 ---
 
 ### Get Available Sources
