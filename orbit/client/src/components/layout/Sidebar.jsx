@@ -206,10 +206,6 @@ export default function Sidebar({ collapsed }) {
           color: var(--risk-critical); 
           background: #fee2e2; 
         }
-
-        @media (max-width: 768px) { 
-          .sidebar { display: none; } 
-        }
       `}</style>
 
       <NavLink to="/dashboard" className="sidebar-brand" style={{ textDecoration: "none" }}>
